@@ -5,17 +5,21 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { Grid } from '@mui/material/';
 
 
-export default function OutlinedCard({ category, correct_answer, difficulty, question, type, incorrect_answers }) {
+export default function OutlinedCard({ category, correct_answer, difficulty, question, type, incorrect_answers, setAnswer }) {
   const answers = incorrect_answers.concat(correct_answer);
   const shuffledAnswers = answers.sort(() => Math.random() - 0.5);
   const replaceQuotationMarks = question.replaceAll('&quot;', '"')
   const replaceApostrophe = replaceQuotationMarks.replaceAll('&#039;', "'");
-  const checkAnswer = (answer) => {
-    console.log('e: ',answer);
-    if(answer === correct_answer) {
-      alert('Correct!');
+  const checkAnswer = (e) => {
+    if(e.target.textContent === correct_answer) {
+      setAnswer(true);
+      console.log('correct');
+    } else {
+      setAnswer(false);
+      console.log('incorrect');
     }
   }
 
@@ -23,26 +27,34 @@ export default function OutlinedCard({ category, correct_answer, difficulty, que
     <React.Fragment>
       <CardContent>
         <Typography sx={{ fontSize: 25 }} color="primary" gutterBottom>
-        {category}
+        Category: {category}
         </Typography>
         <Typography sx={{ fontSize: 25 }} component="div">
           Difficulty: {difficulty}
         </Typography>
-        <Typography sx={{ fontSize: 15 }}>
+        <Typography sx={{ fontSize: 30 }}>
           Question: {replaceApostrophe}
         </Typography>
       </CardContent>
-     {shuffledAnswers.map((answer, i) =>
-      <CardActions>
-        <Button 
-          variant="contained"
-          onClick={() => {
-            checkAnswer(answer);
-          }}
-          size="small">{answer}
-        </Button>
-      </CardActions>
+      <Grid 
+        container
+        direction="row"
+        justifyContent="flex-end"
+        alignItems="center"
+       >
+        {shuffledAnswers.map((answer, i) =>
+          <Grid item xs={3} >
+            <CardActions key={i}>
+              <Button 
+                variant="contained"
+                onClick={checkAnswer}
+                key={i}
+                size="large">{answer}
+              </Button>
+            </CardActions>
+          </Grid>
         )}
+      </Grid>
     </React.Fragment>
   );
   

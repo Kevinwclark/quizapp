@@ -1,35 +1,55 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import Question from './components/Question';
+import { Grid } from '@mui/material';
 
 
 function App() {
 
   const [questions, setQuestions] = useState([]);
-  // console.log('questions', questions); // eslint-disable-line
-//https://opentdb.com/api_config.php
+  const [answer, setAnswer] = useState(null);
+  const [score, setScore] = useState(0);
+  const [questionNumber, setQuestionNumber] = useState(0);
+  console.log(questions.length, questionNumber)
+  console.log('here')
+
+  const fetchQuestions = async () => {
+    const response = await fetch('https://opentdb.com/api.php?amount=10&difficulty=easy&type=multiple');
+    const data = await response.json();
+    setQuestions(data.results);
+  }
   useEffect(() => {
-  var myHeaders = new Headers();
-  myHeaders.append("Cookie", "PHPSESSID=15bcfda0208502e3f707a3d8695f6d7b");
+    fetchQuestions();
+  },[])
 
-  var requestOptions = {
-    method: 'GET',
-    headers: myHeaders,
-    redirect: 'follow'
-  };
-
-  fetch("https://opentdb.com/api.php?amount=10", requestOptions)
-    .then(response => response.text())
-    .then(result => setQuestions(JSON.parse(result).results))
-  }, []);
+  useEffect(() => {
+    if(answer === true) {
+      setScore(score + 1);
+      setAnswer(null)
+      setQuestionNumber(questionNumber + 1);
+    } else if (answer === false) {
+      setAnswer(null)
+      setQuestionNumber(questionNumber + 1);
+    }
+  },[answer])
 
   return (
     <div className="App-header">
-      <h1>Take the Quiz</h1>
-      {questions.map((question, i) =>
-        <Question key={i}
-                  {...question} />
-      )}
+      <Grid container spacing={4} direction='row' justifyContent='space-evenly'>
+
+
+          <Grid item xs={6} md={8}>
+            <h1>Take the Quiz</h1>
+          </Grid>
+
+          <Grid item xs={6} md={4}>
+            <h1>Score: {score}</h1>
+          </Grid>
+
+        <Grid xs={11}>
+          {questions[questionNumber] && <Question key={questions[questionNumber]} setAnswer={setAnswer} {...questions[questionNumber]} />}
+        </Grid> 
+      </Grid>
     </div>
   );
 }
